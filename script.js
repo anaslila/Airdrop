@@ -27,6 +27,7 @@ class AirDropApp {
             this.showDownloadPage(uploadId);
         } else {
             this.attachEventListeners();
+            this.resetApp(); // Ensure upload section is shown if no ID
         }
         
         this.registerServiceWorker();
@@ -67,13 +68,8 @@ class AirDropApp {
         this.copyBtn.addEventListener('click', this.copyLink.bind(this));
         this.newShareBtn.addEventListener('click', this.resetApp.bind(this));
 
-        // Download events
-        if (this.downloadAllBtn) {
-            this.downloadAllBtn.addEventListener('click', () => this.downloadFiles());
-        }
-        if (this.goHomeBtn) {
-            this.goHomeBtn.addEventListener('click', this.goHome.bind(this));
-        }
+        // Download events (attached in showDownloadPage to ensure correct context)
+        // Removed global listeners to prevent multiple attachments
     }
 
     handleDragOver(e) {
@@ -131,7 +127,7 @@ class AirDropApp {
                     name: file.name,
                     size: file.size,
                     type: file.type,
-                    data: base64,
+                    data: base64, // Base64 content for download
                     lastModified: file.lastModified
                 });
 
@@ -179,6 +175,7 @@ class AirDropApp {
         this.hideProgress();
         this.uploadSection.style.display = 'none';
         this.shareSection.style.display = 'block';
+        this.downloadSection.style.display = 'none'; // Hide download section
 
         const shareUrl = `${this.baseUrl}?id=${uploadId}`;
         this.shareLink.value = shareUrl;
@@ -218,9 +215,16 @@ class AirDropApp {
             // Display file info
             this.displayDownloadFileInfo(uploadData.files);
             
-            // Attach download events
-            this.downloadAllBtn.addEventListener('click', () => this.downloadFiles());
-            this.goHomeBtn.addEventListener('click', () => this.goHome());
+            // Attach download events (ensure they are only attached once)
+            // Remove previous listeners to avoid duplicates if navigating back and forth
+            this.downloadAllBtn.removeEventListener('click', this.downloadAllFilesHandler);
+            this.goHomeBtn.removeEventListener('click', this.goHomeHandler);
+
+            this.downloadAllFilesHandler = this.downloadAllFiles.bind(this);
+            this.goHomeHandler = this.goHome.bind(this);
+
+            this.downloadAllBtn.addEventListener('click', this.downloadAllFilesHandler);
+            this.goHomeBtn.addEventListener('click', this.goHomeHandler);
 
         } catch (error) {
             console.error('Error parsing upload data:', error);
@@ -253,16 +257,25 @@ class AirDropApp {
 
         let html = `<h4>Available Files (${fileCount} ${fileCount === 1 ? 'file' : 'files'}, ${this.formatFileSize(totalSize)})</h4>`;
 
-        files.forEach(file => {
+        files.forEach((file, index) => {
             html += `
-                <div class="file-item">
+                <div class="file-item download-item">
                     <span class="file-name">${file.name}</span>
                     <span class="file-size">${this.formatFileSize(file.size)}</span>
+                    <button class="download-single-btn" data-index="${index}">Download</button>
                 </div>
             `;
         });
 
         this.downloadFileInfo.innerHTML = html;
+
+        // Attach listeners for individual download buttons
+        document.querySelectorAll('.download-single-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const index = e.target.dataset.index;
+                this.downloadFile(index);
+            });
+        });
     }
 
     formatFileSize(bytes) {
@@ -290,8 +303,23 @@ class AirDropApp {
         }
     }
 
-    downloadFiles() {
-        if (!this.currentDownloadData) {
+    downloadFile(index) {
+        if (!this.currentDownloadData || !this.currentDownloadData.files[index]) {
+            this.showToast('File not found for download');
+            return;
+        }
+        const file = this.currentDownloadData.files[index];
+        const link = document.createElement('a');
+        link.href = file.data;
+        link.download = file.name;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        this.showToast(`Downloading: ${file.name}`);
+    }
+
+    downloadAllFiles() {
+        if (!this.currentDownloadData || this.currentDownloadData.files.length === 0) {
             this.showToast('No files to download');
             return;
         }
@@ -320,15 +348,16 @@ class AirDropApp {
         this.uploadSection.style.display = 'block';
         this.shareSection.style.display = 'none';
         this.downloadSection.style.display = 'none';
-        this.fileInput.value = '';
+        this.fileInput.value = ''; // Clear file input
         this.progressFill.style.width = '0%';
+        window.history.pushState({}, '', this.baseUrl); // Clear URL params
     }
 
     goHome() {
         // Remove URL parameters and reload
         const url = new URL(window.location);
         url.search = '';
-        window.location.href = url.toString();
+        window.location.href = url.toString(); // This will trigger a full page reload and reset the app
     }
 
     showToast(message) {
@@ -359,10 +388,11 @@ class AirDropApp {
                     const data = JSON.parse(localStorage.getItem(key));
                     if (data.expires && Date.now() > data.expires) {
                         localStorage.removeItem(key);
+                        console.log(`Cleaned up expired file: ${key}`);
                     }
                 } catch (error) {
-                    // Remove corrupted data
-                    localStorage.removeItem(key);
+                    console.error(`Error parsing or cleaning up localStorage key ${key}:`, error);
+                    localStorage.removeItem(key); // Remove corrupted data
                 }
             }
         }
