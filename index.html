@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airdrop v1.0 (Beta)</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="https://ineqe.com/wp-content/uploads/2022/11/Airdrop_Logo2022.png" type="image/png">
+    <meta name="theme-color" content="#007AFF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Airdrop">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-section">
+                <img src="https://ineqe.com/wp-content/uploads/2022/11/Airdrop_Logo2022.png" alt="Airdrop Logo" class="logo">
+                <h1>Airdrop</h1>
+            </div>
+        </header>
+
+        <main>
+            <div class="upload-section" id="uploadSection">
+                <div class="upload-box" id="uploadBox">
+                    <div class="upload-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="#007AFF" stroke-width="2" fill="none"/>
+                            <path d="M14 2V8H20" stroke="#007AFF" stroke-width="2" fill="none"/>
+                            <path d="M12 12V18" stroke="#007AFF" stroke-width="2" fill="none"/>
+                            <path d="M9 15L12 12L15 15" stroke="#007AFF" stroke-width="2" fill="none"/>
+                        </svg>
+                    </div>
+                    <h2>Drop files here or click to upload</h2>
+                    <p>Support any file type - images, videos, documents, folders</p>
+                    <input type="file" id="fileInput" multiple hidden>
+                    <button class="upload-btn" id="uploadBtn">Choose Files</button>
+                </div>
+                <div class="progress-bar" id="progressBar" style="display: none;">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="share-section" id="shareSection" style="display: none;">
+                <div class="share-card">
+                    <h3>Files uploaded successfully!</h3>
+                    <div class="qr-container">
+                        <canvas id="qrCanvas"></canvas>
+                    </div>
+                    <div class="link-container">
+                        <input type="text" id="shareLink" readonly>
+                        <button class="copy-btn" id="copyBtn">Copy Link</button>
+                    </div>
+                    <div class="file-info" id="fileInfo"></div>
+                    <button class="new-share-btn" id="newShareBtn">Upload New Files</button>
+                </div>
+            </div>
+
+            <div class="download-section" id="downloadSection" style="display: none;">
+                <div class="share-card">
+                    <h3>Download Shared Files</h3>
+                    <div class="file-info" id="downloadFileInfo"></div>
+                    <button class="upload-btn" id="downloadAllBtn">Download All Files</button>
+                    <button class="new-share-btn" id="goHomeBtn">Upload Your Files</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Airdrop v1.0 (Beta)</p>
+        </footer>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <script src="script.js"></script>
+</body>
+</html>

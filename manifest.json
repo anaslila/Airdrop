@@ -1,0 +1,44 @@
+{
+    "name": "Airdrop v1.0 (Beta)",
+    "short_name": "Airdrop",
+    "description": "Share files instantly with QR codes and links",
+    "start_url": "./",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#007AFF",
+    "orientation": "portrait-primary",
+    "scope": "./",
+    "lang": "en",
+    "dir": "ltr",
+    "categories": ["productivity", "utilities"],
+    "icons": [
+        {
+            "src": "https://ineqe.com/wp-content/uploads/2022/11/Airdrop_Logo2022.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "https://ineqe.com/wp-content/uploads/2022/11/Airdrop_Logo2022.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Upload Files",
+            "short_name": "Upload",
+            "description": "Quickly upload and share files",
+            "url": "./",
+            "icons": [
+                {
+                    "src": "https://ineqe.com/wp-content/uploads/2022/11/Airdrop_Logo2022.png",
+                    "sizes": "96x96"
+                }
+            ]
+        }
+    ],
+    "prefer_related_applications": false,
+    "related_applications": []
+}
